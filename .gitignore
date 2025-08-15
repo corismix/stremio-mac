@@ -4,3 +4,7 @@ src-tauri/target/
 src-tauri/gen/schemas
 src-tauri/Cargo.lock
 src-tauri/.idea/
+
+# Claude Code
+.claude/
+CLAUDE.md
