@@ -14,8 +14,8 @@
     "core:path:default",
     "core:menu:default",
     "core:tray:default",
-    "shell:allow-open",
-    "shell:default",
+    "opener:allow-open-url",
+    "opener:default",
     "deep-link:default"
   ]
 } 

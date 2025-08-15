@@ -1,13 +1,13 @@
 use tauri::{Manager, Wry};
-use tauri_plugin_shell::ShellExt;
-use tauri_plugin_deep_link::DeepLinkExt;
+use tauri_plugin_opener::OpenerExt;
+// use tauri_plugin_deep_link::DeepLinkExt; // Commented out until deep link implementation is completed
 use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
-use std::{fs, path::PathBuf};
+use std::fs;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-    .plugin(tauri_plugin_shell::init())
+    .plugin(tauri_plugin_opener::init())
     .plugin(tauri_plugin_deep_link::init())
     .setup(|app| {
 
@@ -21,14 +21,14 @@ pub fn run() {
     // Build and register the navigation plugin
     app.handle().plugin(
         tauri::plugin::Builder::<Wry, ()>::new("external-links")
-            .on_navigation(move |window, url| {
+            .on_navigation(move |_window, url| {
                 let is_external = !url.to_string().contains("stremio.com");
 
                 if is_external {
                     println!("Opening external link: {}", url);
-                    // Use the captured app_handle to get the shell scope
-                    let shell_scope = app_handle.shell();
-                    shell_scope.open(url.as_str(), None).expect("Failed to open external link");
+                    // Use the captured app_handle to get the opener
+                    let opener = app_handle.opener();
+                    opener.open_url(url.as_str(), None::<&str>).expect("Failed to open external link");
                     false // Prevent the webview from navigating
                 } else {
                     true // Allow the webview to navigate
@@ -54,7 +54,7 @@ pub fn run() {
           .path()
           .resolve("inject.js", tauri::path::BaseDirectory::Resource)
           .expect("failed to resolve resource path");
-      let mut eval_script_content = fs::read_to_string(&script_path)
+      let eval_script_content = fs::read_to_string(&script_path)
           .expect(&format!("Failed to read script from {:?}", script_path));
 
       // Optionally replace placeholders if needed, though the example doesn't need it now
